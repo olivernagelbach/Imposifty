@@ -304,7 +304,9 @@ function createRoom() {
   // Save host
   db.ref("rooms/" + roomCode + "/host").set(playerId);
 
+  // Save player
   db.ref("rooms/" + roomCode + "/players/" + playerId).set(playerName);
+
   window.location = "game.html?room=" + roomCode + "&name=" + playerName;
 }
 
@@ -338,6 +340,8 @@ if (roomCode) {
     list.innerHTML = "";
     playersDiv.innerHTML = "";
 
+    let isFirst = true;
+
     snapshot.forEach(child => {
       const name = child.val();
       const id = child.key;
@@ -359,16 +363,14 @@ if (roomCode) {
       };
 
       playersDiv.appendChild(btn);
-    });
-  });
 
-  // Host listener for Start Round button
-  db.ref("rooms/" + roomCode + "/host").on("value", snap => {
-    if (snap.exists() && snap.val() === playerId) {
-      document.getElementById("setupBox").style.display = "block";
-    } else {
-      document.getElementById("setupBox").style.display = "none";
-    }
+      // First player = host
+      if (isFirst && id === playerId) {
+        document.getElementById("setupBox").style.display = "block";
+      }
+
+      isFirst = false;
+    });
   });
 
   // Role listener (show role + voting only after game starts)
