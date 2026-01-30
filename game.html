@@ -1,29 +1,94 @@
-function createRoom() {
-  playerName = document.getElementById("name").value;
-  roomCode = Math.random().toString(36).substring(2,6).toUpperCase();
-
-  // Save host
-  db.ref("rooms/" + roomCode + "/host").set(playerId);
-
-  db.ref("rooms/" + roomCode + "/players/" + playerId).set(playerName);
-  window.location = "game.html?room=" + roomCode + "&name=" + playerName;
-}
-
-if (roomCode) {
-  db.ref("rooms/" + roomCode + "/players").on("value", snapshot => {
-    const players = snapshot.val() || {};
-    const playerList = document.getElementById("playerList");
-    playerList.innerHTML = "";
-    Object.values(players).forEach(name => {
-      const li = document.createElement("li");
-      li.textContent = name;
-      playerList.appendChild(li);
-    });
-  });
-
-  db.ref("rooms/" + roomCode + "/host").on("value", snap => {
-    if (snap.exists() && snap.val() === playerId) {
-      document.getElementById("setupBox").style.display = "block";
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Imposter Game</title>
+  <style>
+    body {
+      background: #0f0f0f;
+      color: white;
+      font-family: Arial, sans-serif;
+      text-align: center;
+      padding: 20px;
     }
-  });
-}
+
+    .box {
+      background: #1e1e1e;
+      padding: 20px;
+      margin: 15px auto;
+      border-radius: 12px;
+      max-width: 400px;
+    }
+
+    button {
+      padding: 10px;
+      margin: 5px;
+      border-radius: 6px;
+      border: none;
+      background: #ff3b3b;
+      color: white;
+      cursor: pointer;
+    }
+
+    .playerBtn {
+      width: 100%;
+      margin: 5px 0;
+    }
+
+    ul {
+      list-style: none;
+      padding: 0;
+    }
+
+    li {
+      background: #2a2a2a;
+      padding: 8px;
+      margin: 5px 0;
+      border-radius: 6px;
+    }
+
+    select {
+      padding: 10px;
+      border-radius: 6px;
+      margin-bottom: 10px;
+      width: 100%;
+    }
+  </style>
+</head>
+
+<body>
+
+<h2 id="roomTitle"></h2>
+
+<div class="box" id="lobbyBox">
+  <h3>Players in Lobby</h3>
+  <ul id="playerList"></ul>
+</div>
+
+<div class="box" id="setupBox" style="display:none;">
+  <h3>Host Setup</h3>
+  <select id="categorySelect"></select>
+  <button onclick="startGame()">Start Round</button>
+</div>
+
+<div class="box" id="roleBox" style="display:none;">
+  <h3>Your Role</h3>
+  <div id="role">Waiting for game...</div>
+</div>
+
+<div class="box" id="voteBox" style="display:none;">
+  <h3>Vote</h3>
+  <div id="players"></div>
+  <button onclick="submitVote()">Submit Vote</button>
+</div>
+
+<div class="box">
+  <h3>Result</h3>
+  <div id="result"></div>
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+<script src="script.js"></script>
+
+</body>
+</html>
