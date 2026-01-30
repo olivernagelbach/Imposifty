@@ -300,6 +300,10 @@ const categories = {
 function createRoom() {
   playerName = document.getElementById("name").value;
   roomCode = Math.random().toString(36).substring(2,6).toUpperCase();
+
+  // Save host
+  db.ref("rooms/" + roomCode + "/host").set(playerId);
+
   db.ref("rooms/" + roomCode + "/players/" + playerId).set(playerName);
   window.location = "game.html?room=" + roomCode + "&name=" + playerName;
 }
@@ -334,8 +338,6 @@ if (roomCode) {
     list.innerHTML = "";
     playersDiv.innerHTML = "";
 
-    let isFirst = true;
-
     snapshot.forEach(child => {
       const name = child.val();
       const id = child.key;
@@ -357,14 +359,16 @@ if (roomCode) {
       };
 
       playersDiv.appendChild(btn);
-
-      // First player = host
-      if (isFirst && id === playerId) {
-        document.getElementById("setupBox").style.display = "block";
-      }
-
-      isFirst = false;
     });
+  });
+
+  // Host listener for Start Round button
+  db.ref("rooms/" + roomCode + "/host").on("value", snap => {
+    if (snap.exists() && snap.val() === playerId) {
+      document.getElementById("setupBox").style.display = "block";
+    } else {
+      document.getElementById("setupBox").style.display = "none";
+    }
   });
 
   // Role listener (show role + voting only after game starts)
