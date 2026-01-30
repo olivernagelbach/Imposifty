@@ -17,40 +17,19 @@
       margin: 15px auto;
       border-radius: 12px;
       max-width: 400px;
-      box-shadow: 0 0 15px rgba(0,0,0,0.5);
-    }
-
-    input {
-      width: 90%;
-      padding: 10px;
-      margin: 8px 0;
-      border-radius: 6px;
-      border: none;
     }
 
     button {
-      padding: 10px 15px;
+      padding: 10px;
       margin: 5px;
       border-radius: 6px;
       border: none;
       background: #ff3b3b;
       color: white;
-      cursor: pointer;
-    }
-
-    button:hover {
-      background: #ff5c5c;
     }
 
     .playerBtn {
-      display: block;
       width: 100%;
-      margin: 5px 0;
-    }
-
-    #role {
-      font-size: 20px;
-      margin-top: 10px;
     }
   </style>
 </head>
@@ -59,19 +38,23 @@
 
 <h2 id="roomTitle"></h2>
 
-<div class="box" id="setup">
+<div class="box" id="lobbyBox">
+  <h3>Players in Lobby</h3>
+  <ul id="playerList"></ul>
+</div>
+
+<div class="box" id="setupBox" style="display:none;">
   <h3>Host Setup</h3>
-  <input id="category" placeholder="Category">
-  <input id="word" placeholder="Secret Word">
+  <select id="categorySelect"></select>
   <button onclick="startGame()">Start Game</button>
 </div>
 
-<div class="box">
+<div class="box" id="roleBox" style="display:none;">
   <h3>Your Role</h3>
-  <div id="role">Waiting for game to start...</div>
+  <div id="role">Waiting for game...</div>
 </div>
 
-<div class="box">
+<div class="box" id="voteBox" style="display:none;">
   <h3>Vote</h3>
   <div id="players"></div>
   <button onclick="submitVote()">Submit Vote</button>

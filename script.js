@@ -279,6 +279,7 @@ const categories = {
     { word: "Mid", hint: "Average" },
     { word: "Cringe", hint: "Embarrassing" }
   ],
+  
 
   "Snacks": [
     { word: "Cheetos", hint: "Cheese finger stainer" },
@@ -323,6 +324,63 @@ if (roomCode) {
     option.value = cat;
     option.textContent = cat;
     select.appendChild(option);
+  });
+
+  // Listen for players joining
+  db.ref("rooms/" + roomCode + "/players").on("value", snapshot => {
+    const list = document.getElementById("playerList");
+    const playersDiv = document.getElementById("players");
+
+    list.innerHTML = "";
+    playersDiv.innerHTML = "";
+
+    let isFirst = true;
+
+    snapshot.forEach(child => {
+      const name = child.val();
+      const id = child.key;
+
+      // Lobby list
+      const li = document.createElement("li");
+      li.textContent = name;
+      list.appendChild(li);
+
+      // Voting buttons
+      const btn = document.createElement("button");
+      btn.innerText = name;
+      btn.className = "playerBtn";
+
+      btn.onclick = () => {
+        selectedVote = id;
+        document.querySelectorAll(".playerBtn").forEach(b => b.style.background = "#ff3b3b");
+        btn.style.background = "#4caf50";
+      };
+
+      playersDiv.appendChild(btn);
+
+      // First player = host
+      if (isFirst && id === playerId) {
+        document.getElementById("setupBox").style.display = "block";
+      }
+
+      isFirst = false;
+    });
+  });
+
+  // Role listener (show role + voting only after game starts)
+  db.ref("rooms/" + roomCode + "/roles/" + playerId).on("value", snap => {
+    if (snap.exists()) {
+      document.getElementById("role").innerText = snap.val();
+      document.getElementById("roleBox").style.display = "block";
+      document.getElementById("voteBox").style.display = "block";
+    }
+  });
+
+  // Result listener
+  db.ref("rooms/" + roomCode + "/result").on("value", snap => {
+    if (snap.exists()) {
+      document.getElementById("result").innerText = snap.val();
+    }
   });
 }
 
