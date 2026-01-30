@@ -2,17 +2,65 @@
 <html>
 <head>
   <title>Imposter Game</title>
+  <style>
+    body {
+      background: #111;
+      color: white;
+      font-family: Arial, sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+
+    .card {
+      background: #1e1e1e;
+      padding: 30px;
+      border-radius: 12px;
+      width: 300px;
+      text-align: center;
+      box-shadow: 0 0 20px rgba(0,0,0,0.5);
+    }
+
+    input {
+      width: 90%;
+      padding: 10px;
+      margin: 10px 0;
+      border-radius: 6px;
+      border: none;
+    }
+
+    button {
+      width: 100%;
+      padding: 12px;
+      margin-top: 10px;
+      border-radius: 6px;
+      border: none;
+      background: #ff3b3b;
+      color: white;
+      font-size: 16px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background: #ff5c5c;
+    }
+  </style>
 </head>
+
 <body>
-  <h1>Imposter Game</h1>
+  <div class="card">
+    <h1>😈 Imposter Game</h1>
 
-  <input id="name" placeholder="Your name"><br><br>
-  <button onclick="createRoom()">Create Room</button>
+    <input id="name" placeholder="Your name">
 
-  <br><br>
+    <button onclick="createRoom()">Create Room</button>
 
-  <input id="roomCode" placeholder="Room Code">
-  <button onclick="joinRoom()">Join Room</button>
+    <hr style="margin:20px 0;">
+
+    <input id="roomCode" placeholder="Room Code">
+    <button onclick="joinRoom()">Join Room</button>
+  </div>
 
 <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
 <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>

@@ -1,4 +1,4 @@
-// 🔥 Firebase config (paste yours here)
+// 🔥 Firebase config
 const firebaseConfig = {
   apiKey: "AIzaSyAyMVYqX0-efA9uvjNZNS6GdSp6HgzvKi0",
   authDomain: "Yimposter-multiplayer-58828.firebaseapp.com",
@@ -37,49 +37,65 @@ const params = new URLSearchParams(window.location.search);
 roomCode = params.get("room");
 playerName = params.get("name");
 
-if(roomCode){
+if (roomCode) {
   document.getElementById("roomTitle").innerText = "Room: " + roomCode;
 
+  // Show players as buttons
   db.ref("rooms/" + roomCode + "/players").on("value", snapshot => {
     let playersDiv = document.getElementById("players");
     playersDiv.innerHTML = "";
+
     snapshot.forEach(child => {
       let name = child.val();
       let btn = document.createElement("button");
       btn.innerText = name;
-      btn.onclick = () => selectedVote = child.key;
+      btn.className = "playerBtn";
+
+      btn.onclick = () => {
+        selectedVote = child.key;
+
+        // reset all buttons
+        const allButtons = document.querySelectorAll(".playerBtn");
+        allButtons.forEach(b => b.style.background = "#ff3b3b");
+
+        // highlight selected
+        btn.style.background = "#4caf50";
+      };
+
       playersDiv.appendChild(btn);
     });
   });
 
+  // Show role
   db.ref("rooms/" + roomCode + "/roles/" + playerId).on("value", snap => {
-    if(snap.exists()){
+    if (snap.exists()) {
       document.getElementById("role").innerText = snap.val();
     }
   });
 
+  // Show result
   db.ref("rooms/" + roomCode + "/result").on("value", snap => {
-    if(snap.exists()){
+    if (snap.exists()) {
       document.getElementById("result").innerText = snap.val();
     }
   });
 }
 
 // Start game
-function startGame(){
+function startGame() {
   const category = document.getElementById("category").value;
   const word = document.getElementById("word").value;
 
   db.ref("rooms/" + roomCode + "/category").set(category);
   db.ref("rooms/" + roomCode + "/word").set(word);
 
-  db.ref("rooms/" + roomCode + "/players").once("value").then(snapshot=>{
+  db.ref("rooms/" + roomCode + "/players").once("value").then(snapshot => {
     let keys = [];
-    snapshot.forEach(child=>keys.push(child.key));
-    let imposter = keys[Math.floor(Math.random()*keys.length)];
+    snapshot.forEach(child => keys.push(child.key));
+    let imposter = keys[Math.floor(Math.random() * keys.length)];
 
-    keys.forEach(id=>{
-      if(id === imposter){
+    keys.forEach(id => {
+      if (id === imposter) {
         db.ref("rooms/" + roomCode + "/roles/" + id).set("You are the IMPOSTER");
       } else {
         db.ref("rooms/" + roomCode + "/roles/" + id).set("Word: " + word);
@@ -89,17 +105,25 @@ function startGame(){
 }
 
 // Vote
-function submitVote(){
+function submitVote() {
+  if (!selectedVote) {
+    alert("Please select a player to vote for!");
+    return;
+  }
+
   db.ref("rooms/" + roomCode + "/votes/" + playerId).set(selectedVote);
 
-  db.ref("rooms/" + roomCode + "/votes").once("value").then(snapshot=>{
+  db.ref("rooms/" + roomCode + "/votes").once("value").then(snapshot => {
     let counts = {};
-    snapshot.forEach(child=>{
+    snapshot.forEach(child => {
       let vote = child.val();
       counts[vote] = (counts[vote] || 0) + 1;
     });
 
-    let winner = Object.keys(counts).reduce((a,b)=>counts[a]>counts[b]?a:b);
+    let winner = Object.keys(counts).reduce((a, b) =>
+      counts[a] > counts[b] ? a : b
+    );
+
     db.ref("rooms/" + roomCode + "/result").set("Voted out: " + winner);
   });
 }
